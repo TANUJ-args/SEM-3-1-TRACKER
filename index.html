@@ -1031,7 +1031,12 @@ body {
             }
         ];
 
-        let completedTopics = {};
+        // Load data from localStorage if available
+        let completedTopics = JSON.parse(localStorage.getItem('syllabusTrackerData')) || {};
+
+        function saveData() {
+            localStorage.setItem('syllabusTrackerData', JSON.stringify(completedTopics));
+        }
 
         function initializeApp() {
             renderSubjects();
@@ -1109,6 +1114,7 @@ body {
 
         function toggleTopic(topicId) {
             completedTopics[topicId] = !completedTopics[topicId];
+            saveData();
             
             const topicItem = document.querySelector(`[data-topic-id="${topicId}"]`);
             if (completedTopics[topicId]) {
@@ -1185,12 +1191,14 @@ body {
                 });
             });
 
+            saveData();
             renderSubjects();
             updateOverallProgress();
         }
 
         function clearAll() {
             completedTopics = {};
+            saveData();
             renderSubjects();
             updateOverallProgress();
         }
