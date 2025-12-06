@@ -471,6 +471,76 @@ body {
   display: none !important;
 }
 
+.exam-schedule {
+  background: var(--color-surface);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-24);
+  margin-bottom: var(--space-24);
+  box-shadow: var(--shadow-sm);
+}
+
+.exam-schedule h2 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  margin-bottom: var(--space-16);
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+.exam-schedule .time-info {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-16);
+  font-weight: var(--font-weight-medium);
+}
+
+.exam-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.exam-table th,
+.exam-table td {
+  padding: var(--space-12) var(--space-16);
+  text-align: left;
+  border-bottom: 1px solid var(--color-card-border-inner);
+}
+
+.exam-table th {
+  background: var(--color-secondary);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.exam-table tr:hover {
+  background: var(--color-secondary);
+}
+
+.exam-table .paper-code {
+  font-family: monospace;
+  color: var(--color-primary);
+}
+
+.exam-table .max-marks {
+  text-align: center;
+  font-weight: var(--font-weight-bold);
+}
+
+@media (max-width: 768px) {
+  .exam-table {
+    font-size: var(--font-size-xs);
+  }
+  
+  .exam-table th,
+  .exam-table td {
+    padding: var(--space-8) var(--space-10);
+  }
+}
+
 .footer {
     margin-top: var(--space-32);
     padding: var(--space-20);
@@ -554,6 +624,59 @@ body {
         <div class="search-container">
             <input type="text" class="search-input" id="search-input" placeholder="Search topics..." oninput="filterTopics()">
         </div>
+    </div>
+
+    <div class="exam-schedule">
+        <h2>📅 Exam Schedule</h2>
+        <p class="time-info">TIME: 2:00 PM TO 5:00 PM</p>
+        <table class="exam-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Day</th>
+                    <th>Subjects</th>
+                    <th>Paper Code</th>
+                    <th class="max-marks">Max. Marks</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>15-12-2025</td>
+                    <td>Monday</td>
+                    <td>Data Communications & Computer Networks</td>
+                    <td class="paper-code">07BENG 3132</td>
+                    <td class="max-marks">70</td>
+                </tr>
+                <tr>
+                    <td>17-12-2025</td>
+                    <td>Wednesday</td>
+                    <td>Artificial Intelligence</td>
+                    <td class="paper-code">07BENG 3133</td>
+                    <td class="max-marks">70</td>
+                </tr>
+                <tr>
+                    <td>19-12-2025</td>
+                    <td>Friday</td>
+                    <td>Compiler Design</td>
+                    <td class="paper-code">07BENG 3134</td>
+                    <td class="max-marks">70</td>
+                </tr>
+                <tr>
+                    <td>20-12-2025</td>
+                    <td>Saturday</td>
+                    <td>Data Warehousing & Data Mining (Professional Elective)</td>
+                    <td class="paper-code">07BENG 3135</td>
+                    <td class="max-marks">70</td>
+                </tr>
+                <tr>
+                    <td>22-12-2025</td>
+                    <td>Monday</td>
+                    <td>Python Programming (Open Elective)</td>
+                    <td class="paper-code">07BENG 3141</td>
+                    <td class="max-marks">70</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <div id="subjects-container"></div>
