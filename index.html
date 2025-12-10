@@ -414,6 +414,47 @@ body {
   border-bottom: none;
 }
 
+.subtopic-toggle {
+    appearance: none;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: var(--font-size-sm);
+    padding: 4px 6px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-standard);
+}
+
+.subtopic-toggle:hover {
+    background: var(--color-secondary);
+}
+
+.subtopic-toggle.expanded {
+    transform: rotate(90deg);
+}
+
+.topic-subtopics {
+    margin-left: 36px;
+    padding: var(--space-8) var(--space-12);
+    border-left: 2px solid var(--color-border);
+    background: rgba(var(--color-brown-600-rgb), 0.04);
+    border-radius: var(--radius-sm);
+    display: none;
+}
+
+.topic-item.expanded .topic-subtopics {
+    display: block;
+}
+
+.topic-subtopics ul {
+    list-style: disc;
+    padding-left: var(--space-16);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    line-height: 1.4;
+}
+
 .checkbox-wrapper {
   position: relative;
   flex-shrink: 0;
@@ -816,70 +857,71 @@ body {
                     {
                         name: "Introduction to Data Communications",
                         topics: [
-                            "A Communications Model",
-                            "Network Models: OSI Model",
-                            "Network Models: TCP/IP Model",
-                            "Analog and Digital Data Transmission",
-                            "Transmission Impairments"
+                            "A Communications Model (signals, data, channels, noise)",
+                            "Network Models: OSI Model (layers, PDUs, service primitives)",
+                            "Network Models: TCP/IP Model (layer mapping, encapsulation)",
+                            "Analog and Digital Data Transmission (bandwidth, throughput)",
+                            "Transmission Impairments: attenuation, distortion, noise, SNR"
                         ]
                     },
                     {
                         name: "Data Communication Interface",
                         topics: [
-                            "Asynchronous Transmission",
-                            "Synchronous Transmission",
-                            "Data Link Control",
-                            "Flow Control",
-                            "Error Detection",
-                            "Error Control",
-                            "High-Level Data Link Control (HDLC)"
+                            "Asynchronous vs Synchronous Transmission",
+                            "Framing: character/bit stuffing, flags",
+                            "Flow Control: Stop-and-Wait, Sliding Window",
+                            "Error Detection: parity, checksum, CRC",
+                            "Error Control: ARQ (Stop-and-Wait, Go-Back-N, Selective Repeat)",
+                            "Data Link Control: link management, timers",
+                            "High-Level Data Link Control (HDLC) roles and frames"
                         ]
                     },
                     {
                         name: "Signal Encoding Techniques",
                         topics: [
-                            "Digital data to Digital signal",
-                            "Digital to Analog Signal",
-                            "Analog data to Digital Signal",
-                            "Analog Data to Analog signal"
+                            "Digital data to Digital signal: NRZ, Manchester, AMI",
+                            "Digital data to Analog signal: ASK, FSK, PSK, QAM",
+                            "Analog data to Digital Signal: Sampling, PCM, Delta Modulation",
+                            "Analog data to Analog signal: AM, FM, PM"
                         ]
                     },
                     {
                         name: "Multiplexing",
                         topics: [
-                            "Frequency-Division Multiplexing",
-                            "Synchronous Time-Division Multiplexing: Characteristics",
-                            "Digital Carrier Systems",
-                            "Statistical Time-Division Multiplexing: Characteristics"
+                            "Frequency-Division Multiplexing: bands, guards, modulation",
+                            "Synchronous TDM: framing, synchronization, padding",
+                            "Digital Carrier Systems (T-carrier/E-carrier basics)",
+                            "Statistical TDM: dynamic slots, efficiency"
                         ]
                     },
                     {
                         name: "Medium Access Control Sublayer",
                         topics: [
-                            "Wireless LANs",
-                            "802.11 Architecture",
-                            "802.11 Protocol Stack",
-                            "802.11 Frame structure"
+                            "Wireless LANs overview",
+                            "802.11 Architecture (BSS, ESS, AP)",
+                            "MAC: CSMA/CA, NAV, backoff, RTS/CTS, hidden/exposed nodes",
+                            "802.11 Frame structure (control, management, data)"
                         ]
                     },
                     {
                         name: "Network Layer",
                         topics: [
-                            "Network Layer Design Issues",
-                            "Shortest path routing algorithm",
-                            "Congestion Control Algorithms",
-                            "IP Protocol",
-                            "IP Address"
+                            "Network Layer Design Issues (services, QoS)",
+                            "Shortest path routing: Dijkstra, Bellman-Ford idea",
+                            "Congestion Control: detection and avoidance basics",
+                            "IP Protocol: header fields, fragmentation",
+                            "IP Addressing: classes, subnetting, CIDR, prefix notation",
+                            "ICMP basics (errors and diagnostics)"
                         ]
                     },
                     {
                         name: "Transport Layer",
                         topics: [
-                            "Transport Service",
-                            "Elements of Transport Protocols",
-                            "TCP Protocol",
-                            "UDP Protocol",
-                            "Simple Network Management Protocol (SNMP)"
+                            "Transport Service primitives, sockets",
+                            "Elements of Transport Protocols: connection setup/teardown",
+                            "TCP: 3-way handshake, reliability, flow & congestion control",
+                            "UDP: lightweight transport, checksum",
+                            "Simple Network Management Protocol (SNMP) components & PDUs"
                         ]
                     }
                 ]
@@ -1251,6 +1293,7 @@ body {
                         ${chapter.topics.map((topic, topicIndex) => {
                             const topicId = `${subjectIndex}-${chapterIndex}-${topicIndex}`;
                             const isCompleted = completedTopics[topicId] || false;
+                            const subtopics = generateSubtopics(topic);
                             return `
                                 <li class="topic-item ${isCompleted ? 'completed' : ''}" data-topic-id="${topicId}">
                                     <div class="checkbox-wrapper">
@@ -1260,7 +1303,13 @@ body {
                                                ${isCompleted ? 'checked' : ''}
                                                onchange="toggleTopic('${topicId}')">
                                     </div>
+                                    <button type="button" class="subtopic-toggle" id="toggle-${topicId}" onclick="toggleSubtopics('${topicId}')">▶</button>
                                     <label class="topic-label" for="checkbox-${topicId}">${topic}</label>
+                                    <div class="topic-subtopics" id="subtopics-${topicId}">
+                                        <ul>
+                                            ${subtopics.map(sub => `<li>${sub}</li>`).join('')}
+                                        </ul>
+                                    </div>
                                 </li>
                             `;
                         }).join('')}
@@ -1275,6 +1324,281 @@ body {
             
             header.classList.toggle('expanded');
             content.classList.toggle('expanded');
+        }
+
+        function generateSubtopics(topicTitle) {
+            const t = topicTitle.toLowerCase();
+            const match = (phrase) => t.includes(phrase);
+
+            // Compiler Design
+            if (match('lexical')) return [
+                'Tokenization pipeline and role of lexemes/patterns/tokens',
+                'Regex to NFA/DFA construction for token recognition',
+                'Handling whitespace, comments, and lexical error recovery'
+            ];
+            if (match('regular expression')) return [
+                'Operators (concatenation, union, closure) and precedence',
+                'From regex to Thompson NFA and subset construction',
+                'Equivalence, minimization, and common regex pitfalls'
+            ];
+            if (match('finite automata') || match('dfa') || match('nfa')) return [
+                'DFA vs NFA expressiveness and conversion steps',
+                'State minimization and unreachable state elimination',
+                'Acceptance, language definition, and closure properties'
+            ];
+            if (match('parsing') || match('parser')) return [
+                'Top-down vs bottom-up strategies and when to choose each',
+                'FIRST/FOLLOW sets, LL(1) table construction, conflicts',
+                'Shift-reduce parsing, handles, and LR family overview'
+            ];
+            if (match('syntax directed') || match('semantic') || match('type')) return [
+                'Syntax-directed definitions: synthesized vs inherited attributes',
+                'Dependency graphs, evaluation orders, and S-attributed forms',
+                'Type checking rules, coercions, and semantic error handling'
+            ];
+            if (match('intermediate code') || match('three address') || match('tac')) return [
+                'TAC forms: quad, triple, indirect triple representations',
+                'Translation of expressions, conditionals, and short-circuit code',
+                'Temporary management and basic block formation'
+            ];
+            if (match('code optimization') || match('peephole') || match('data flow')) return [
+                'Local vs global optimizations and safety considerations',
+                'Common subexpression elimination, copy/constant propagation',
+                'Liveness, reaching definitions, and loop-invariant motion'
+            ];
+            if (match('code generation') || match('register allocation')) return [
+                'Instruction selection patterns and target constraints',
+                'Graph coloring register allocation and spilling decisions',
+                'Evaluation order, DAG-based scheduling, and cost models'
+            ];
+
+            // DCCN
+            if (match('osi') || match('tcp/ip')) return [
+                'Layer purposes, service primitives, and PDUs per layer',
+                'Encapsulation/decapsulation path and addressing scope',
+                'Typical protocols per layer and mapping between stacks'
+            ];
+            if (match('transmission') || match('impairments')) return [
+                'Bandwidth, data rate, Nyquist/Shannon intuition',
+                'Attenuation, distortion, noise types and SNR budgeting',
+                'Clocking, line coding impact, and media considerations'
+            ];
+            if (match('flow control')) return [
+                'Stop-and-wait vs sliding window trade-offs',
+                'Window sizing, RTT impact, and throughput math',
+                'Interaction with error control (ARQ variants)'
+            ];
+            if (match('error detection') || match('crc') || match('checksum')) return [
+                'Parity/checksum vs CRC strengths and polynomial choice',
+                'Bit/error patterns detectable and undetectable cases',
+                'Frame check sequence placement and verification steps'
+            ];
+            if (match('hdlc')) return [
+                'Station roles (primary/secondary/combined) and modes',
+                'Frame types: I, S, U with key control bits',
+                'Transparency via bit-stuffing and error handling'
+            ];
+            if (match('multiplexing') || match('tdm') || match('fdm')) return [
+                'Resource splitting: frequency vs time vs statistical slots',
+                'Sync needs, framing bits, guard bands, and padding',
+                'Efficiency trade-offs and typical use cases'
+            ];
+            if (match('802.11') || match('wireless') || match('csma/ca')) return [
+                'BSS/ESS roles, AP association, and management frames',
+                'CSMA/CA with NAV/backoff, RTS/CTS, hidden/exposed nodes',
+                '802.11 frame fields and QoS/fragmentation basics'
+            ];
+            if (match('routing') || match('dijkstra') || match('bellman')) return [
+                'Link-state vs distance-vector information sharing',
+                'Path computation steps and convergence behavior',
+                'Count-to-infinity issues and split horizon/poison reverse'
+            ];
+            if (match('ip protocol') || match('ip address') || match('subnet')) return [
+                'Header fields, options, and fragmentation/reassembly',
+                'Classful vs CIDR addressing and subnet sizing math',
+                'ARP/ICMP roles and basic troubleshooting commands'
+            ];
+            if (match('tcp')) return [
+                '3-way handshake/teardown and state machine highlights',
+                'Sliding window, ACK strategies, and retransmission timers',
+                'Congestion control: slow start, AIMD, fast retransmit/recover'
+            ];
+            if (match('udp')) return [
+                'Header simplicity, checksum role, and use cases',
+                'Multiplexing/demultiplexing via ports',
+                'App-layer responsibilities (reliability/ordering)'
+            ];
+            if (match('snmp')) return [
+                'Managers, agents, and MIB structure',
+                'PDU types (Get, Set, Trap, Inform)',
+                'Polling vs traps and basic OID navigation'
+            ];
+
+            // AI
+            if (match('state space') || match('production system')) return [
+                'State representation, operators, and goal tests',
+                'Search tree vs graph, branching factor, depth/width',
+                'Production rules, conflict resolution, and control strategies'
+            ];
+            if (match('uninformed') || match('bfs') || match('dfs')) return [
+                'Completeness/optimality and time-space trade-offs',
+                'Loop detection and depth/iteration limits',
+                'Path cost sensitivity and branching impacts'
+            ];
+            if (match('heuristic') || match('a*') || match('best-first') || match('hill climbing')) return [
+                'Heuristic admissibility/consistency and implications',
+                'Open/closed list management and tie-breaking',
+                'Plateaus, local maxima, and remedies (random restart, beam)'
+            ];
+            if (match('ao*') || match('problem reduction')) return [
+                'AND-OR graph semantics and solution subgraphs',
+                'Cost propagation through AND/OR branches',
+                'Heuristic guidance and pruning in AO*'
+            ];
+            if (match('constraint') || match('csp')) return [
+                'Variable ordering and value ordering heuristics',
+                'Forward checking, arc consistency (AC-3)',
+                'Backtracking variants and pruning effectiveness'
+            ];
+            if (match('propositional') || match('predicate logic') || match('resolution')) return [
+                'Syntax vs semantics, CNF conversion steps',
+                'Unification algorithm basics and occurs-check idea',
+                'Resolution refutation strategy and completeness intuition'
+            ];
+            if (match('unification') || match('clause form')) return [
+                'Substitutions and most general unifier (MGU)',
+                'Standardizing apart and variable renaming',
+                'Resolution with MGU on Horn/non-Horn clauses'
+            ];
+            if (match('bayes') || match('probabilistic') || match('belief')) return [
+                'Conditional probability and Bayes rule usage',
+                'Naive Bayes independence assumption effects',
+                'Belief networks: DAG, CPTs, and inference intuition'
+            ];
+            if (match('tms') || match('truth maintenance') || match('dependency-directed')) return [
+                'Justifications and support sets for derived facts',
+                'Dependency tracking for backtracking and revisions',
+                'Consistency maintenance under changing beliefs'
+            ];
+            if (match('fuzzy')) return [
+                'Membership functions and linguistic variables',
+                'Fuzzy operators (t-norm, t-conorm) and rules',
+                'Defuzzification methods (centroid, max-membership)'
+            ];
+            if (match('semantic net') || match('frames')) return [
+                'Nodes/edges meaning and inheritance semantics',
+                'Slots/fillers, defaults, and overrides',
+                'Handling exceptions and multiple inheritance'
+            ];
+            if (match('planning') || match('goal stack') || match('constraint posting')) return [
+                'State-space vs plan-space vs hierarchical approaches',
+                'Goal interactions, ordering constraints, and threats',
+                'Partial-order planning and commitment strategies'
+            ];
+            if (match('expert system')) return [
+                'Knowledge base vs inference engine separation',
+                'Forward vs backward chaining and when to use each',
+                'Shells, explanation facilities, and knowledge acquisition'
+            ];
+
+            // Python
+            if (match('string')) return [
+                'Immutability and common methods (split/join/format)',
+                'Slicing rules, strides, and negative indices',
+                'Unicode awareness and encoding basics'
+            ];
+            if (match('list') || match('tuple')) return [
+                'Mutability, copying (shallow/deep), and slicing',
+                'Common ops: comprehension, map/filter, sorting keys',
+                'When to use list vs tuple (semantics/immutability)'
+            ];
+            if (match('set')) return [
+                'Uniqueness, hashing requirements, and frozenset',
+                'Set algebra: union/intersection/difference/symmetric diff',
+                'Membership performance and common pitfalls'
+            ];
+            if (match('dictionary') || match('dict')) return [
+                'Key hashing rules and mutable key caveats',
+                'Iteration order guarantees (Py3.7+ insertion order)',
+                'Common patterns: get/defaultdict/Counter'
+            ];
+            if (match('function') || match('module')) return [
+                'Positional vs keyword args and default evaluation time',
+                '*args/**kwargs usage and packing/unpacking',
+                'Imports, module search path, and __name__ == "__main__"'
+            ];
+            if (match('exception')) return [
+                'Hierarchy and choosing specific exceptions',
+                'try/except/else/finally patterns',
+                'Raising custom exceptions and clean-up guarantees'
+            ];
+            if (match('oop') || match('class') || match('inheritance') || match('polymorphism')) return [
+                'Instance vs class attributes and method resolution order (MRO)',
+                'Property/getter-setter patterns and descriptors',
+                'Dunder methods for operator overloading and protocol support'
+            ];
+            if (match('file') || match('binary') || match('text')) return [
+                'Opening modes, buffering, and newline handling',
+                'Context managers with with-statement safety',
+                'Encoding/decoding considerations for text I/O'
+            ];
+            if (match('numpy')) return [
+                'Array creation and dtype choices',
+                'Vectorized ops vs Python loops and broadcasting rules',
+                'Views vs copies, slicing semantics, and memory layout'
+            ];
+            if (match('pandas')) return [
+                'Series vs DataFrame structures and indexes',
+                'Selection: loc/iloc, boolean masks, and alignment',
+                'GroupBy/aggregation, missing data handling, and reshaping'
+            ];
+            if (match('matplotlib') || match('visualization') || match('plot')) return [
+                'Figure/axes model and styling basics',
+                'Common plot types: line, bar, scatter, hist',
+                'Legends, labels, and saving figures reproducibly'
+            ];
+
+            // DWDM
+            if (match('data cleaning') || match('preprocessing') || match('transformation')) return [
+                'Handling missing/noisy data (impute, winsorize, smooth)',
+                'Normalization, standardization, and discretization',
+                'Integration and schema alignment challenges'
+            ];
+            if (match('data warehouse') || match('olap') || match('cube')) return [
+                'Star/snowflake schemas and fact vs dimension tables',
+                'Roll-up/drill-down, slice/dice, and pivot operations',
+                'Cube materialization and aggregation design choices'
+            ];
+            if (match('association') || match('apriori') || match('fp-growth')) return [
+                'Support/confidence/lift metrics and thresholds',
+                'Candidate generation/pruning vs pattern-growth',
+                'Rule evaluation, redundancy, and interestingness'
+            ];
+            if (match('classification') || match('prediction') || match('bayes') || match('decision tree')) return [
+                'Model selection, overfitting, and validation splits',
+                'Bias-variance considerations and pruning/regularization',
+                'Evaluation metrics: accuracy, precision/recall, F1, ROC'
+            ];
+            if (match('clustering') || match('k-nearest') || match('partitioning') || match('hierarchical') || match('density')) return [
+                'Distance metrics and feature scaling impacts',
+                'Choosing k, linkage criteria, and dendrogram reading',
+                'Density/shape sensitivity and cluster validity indices'
+            ];
+
+            // Fallback generic but still useful
+            return [
+                `${topicTitle} – key definitions and purpose`,
+                `${topicTitle} – typical workflow or algorithm steps`,
+                `${topicTitle} – common pitfalls and best practices`
+            ];
+        }
+
+        function toggleSubtopics(topicId) {
+            const item = document.querySelector(`[data-topic-id="${topicId}"]`);
+            const toggleBtn = document.getElementById(`toggle-${topicId}`);
+            if (!item || !toggleBtn) return;
+            item.classList.toggle('expanded');
+            toggleBtn.classList.toggle('expanded');
         }
 
         function toggleTopic(topicId) {
